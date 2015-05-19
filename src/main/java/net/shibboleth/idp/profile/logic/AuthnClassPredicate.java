@@ -19,11 +19,16 @@ public final class AuthnClassPredicate implements Predicate<ProfileRequestContex
 
     private Set<String> authnClassesToMatch;
 
+    private Set<String> authnClassesToForgive;
+
     private Predicate<ProfileRequestContext> predicateToDelegate;
 
-    public AuthnClassPredicate(Set<String> authnClassesToMatch, Predicate<ProfileRequestContext> predicateToDelegate) {
+    public AuthnClassPredicate(Set<String> authnClassesToMatch,
+                               Set<String> authnClassesToForgive,
+                               Predicate<ProfileRequestContext> predicateToDelegate) {
         this.authnClassesToMatch = authnClassesToMatch;
         this.predicateToDelegate = predicateToDelegate;
+        this.authnClassesToForgive = authnClassesToForgive;
     }
 
     @Override
@@ -37,7 +42,7 @@ public final class AuthnClassPredicate implements Predicate<ProfileRequestContex
         final RequestedPrincipalContext principalContext = authnContext.getSubcontext(RequestedPrincipalContext.class);
 
         if (principalContext == null) {
-            log.debug("No principal context was requested. predicate wil ignore the context");
+            log.debug("No principal context was requested. Predicate wil ignore the context");
             return true;
         }
 
@@ -45,6 +50,12 @@ public final class AuthnClassPredicate implements Predicate<ProfileRequestContex
         final Principal principal = principalContext.getMatchingPrincipal();
         final String principalName = principal.getName();
         log.debug("Matching principal name is {}", principalName);
+
+        if (this.authnClassesToForgive.contains(principalName)) {
+            log.debug("The requested authn principal {} is forgiven by the set of {}. Predicate wil ignore the context",
+                    principalName, Arrays.toString(this.authnClassesToMatch.toArray()));
+            return true;
+        }
 
         if (this.authnClassesToMatch.contains(principalName)) {
             log.debug("Found matching principal name {} for the requested authn class. Calling delegate...",
@@ -54,13 +65,13 @@ public final class AuthnClassPredicate implements Predicate<ProfileRequestContex
             if (delegateResult) {
                 log.debug("Delegate {} returned true. Moving on...", this.predicateToDelegate.getClass().getSimpleName());
                 return true;
-            } else {
-                log.debug("Delegate could not evaluate the context. Failing...");
-                return false;
             }
 
+            log.debug("Delegate could not evaluate the context. Failing...");
+            return false;
+
         }
-        log.debug("Could not match the requested authn principal {} against {}",
+        log.warn("Could not match the requested authn principal {} against {}",
                 principalName, Arrays.toString(this.authnClassesToMatch.toArray()));
         return false;
     }
