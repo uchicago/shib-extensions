@@ -237,8 +237,8 @@
         <opensaml.version>3.1.1</opensaml.version>
         <maven.plugin.jar>2.6</maven.plugin.jar>
         <maven.plugin.compiler>3.3</maven.plugin.compiler>
-        <project.build.sourceVersion>1.7</project.build.sourceVersion>
-        <project.build.targetVersion>1.7</project.build.targetVersion>
+        <project.build.sourceVersion>1.8</project.build.sourceVersion>
+        <project.build.targetVersion>1.8</project.build.targetVersion>
     </properties>
 
     <repositories>
