@@ -2,10 +2,12 @@ package edu.uchicago.identity.shibboleth.firstlogin;
 
 import org.springframework.webflow.execution.RequestContext;
 
+import java.io.Serializable;
+
 /**
  * Created by davel on 8/21/15.
  */
-public class FirstLoginTrackingAction {
+public class FirstLoginTrackingAction implements Serializable {
 
     public FirstLoginTrackingAction(){
         super();
