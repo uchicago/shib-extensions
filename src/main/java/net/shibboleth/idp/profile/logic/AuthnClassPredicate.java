@@ -3,7 +3,7 @@ package net.shibboleth.idp.profile.logic;
 import net.shibboleth.idp.authn.context.AuthenticationContext;
 import net.shibboleth.idp.authn.context.RequestedPrincipalContext;
 import org.opensaml.profile.context.ProfileRequestContext;
-import com.google.common.base.Predicate;
+import java.util.function.Predicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +32,7 @@ public final class AuthnClassPredicate implements Predicate<ProfileRequestContex
     }
 
     @Override
-    public boolean apply(ProfileRequestContext profileRequestContext) {
+    public boolean test(ProfileRequestContext profileRequestContext) {
         log.debug("Evaluating profile request context for authn class...");
 
         log.debug("Getting authn context from the profile request context...");
@@ -61,7 +61,7 @@ public final class AuthnClassPredicate implements Predicate<ProfileRequestContex
             log.debug("Found matching principal name {} for the requested authn class. Calling delegate...",
                     principalName);
 
-            boolean delegateResult = this.predicateToDelegate.apply(profileRequestContext);
+            boolean delegateResult = this.predicateToDelegate.test(profileRequestContext);
             if (delegateResult) {
                 log.debug("Delegate {} returned true. Moving on...", this.predicateToDelegate.getClass().getSimpleName());
                 return true;
